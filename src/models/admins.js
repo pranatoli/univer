@@ -1,21 +1,21 @@
 const Sequilize = require('sequelize')
 const db = require('../../config/database')
-const Courses = require('./courses')
 
-const Student = db.define('student', {
+const Admin = db.define('admin', {
     id: {
         type: Sequilize.INTEGER,
-        autoIncrement: true,
         primaryKey: true,
-        allowNull: false
+        autoIncrement: true,
     },
-    email: {
+    login: {
         type: Sequilize.STRING,
-        allowNull: false,
+    },
+    password: {
+        type: Sequilize.STRING,
     },
 },
     {
         timestamps: false,
     })
 
-module.exports = Student;
+module.exports = Admin;

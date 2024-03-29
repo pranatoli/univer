@@ -24,8 +24,8 @@ const Grade = db.define('grade', {
             key: 'id',
         }
     },
-    email: {
-        type: Sequilize.STRING,
+    grade: {
+        type: Sequilize.INTEGER,
         allowNull: false,
     }
 },

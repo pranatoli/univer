@@ -56,7 +56,7 @@ const Admins = require('./admins');
 Students.hasOne(Profile)
 Profile.belongsTo(Students)
 
-Students.hasMany(Grades, { foreignKey: 'studentId' })
+Students.hasMany(Grades, { foreignKey: 'studentId', onDelete: 'CASCADE' })
 Grades.belongsTo(Students)
 
 Teachers.hasMany(Courses, { foreignKey: 'teacherId' })

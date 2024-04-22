@@ -53,13 +53,13 @@ const Admins = require('./admins');
 
 // ------- Associations -------
 
-Students.hasOne(Profile, { foreignKey: 'student_id' })
+Students.hasOne(Profile)
 Profile.belongsTo(Students)
 
-Students.hasMany(Grades, { foreignKey: 'student_id' })
+Students.hasMany(Grades, { foreignKey: 'studentId' })
 Grades.belongsTo(Students)
 
-Teachers.hasMany(Courses, { foreignKey: 'teacher_id' })
+Teachers.hasMany(Courses, { foreignKey: 'teacherId' })
 Courses.belongsTo(Teachers)
 
 Students.belongsToMany(Courses, { through: StudentCourses })

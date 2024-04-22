@@ -1,7 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const TeachersControllers = require('../controllers/teachers.controllers');
+const jwt = require('jsonwebtoken');
+const { authenticateToken } = require('../helpers/helpers');
 const { body, query, param, matchedData, validationResult } = require('express-validator');
+
+const validationBody = [
+    body('first_name').notEmpty().isString().trim().escape(),
+    body('last_name').notEmpty().isString().trim().escape(),
+    body('email').notEmpty().isString().isEmail().withMessage('Not a valid e-mail address').escape(),
+];
+
+const validationParamId = [
+    param('id').notEmpty().isInt().withMessage('ID not correct')
+]
 
 /**
  * @swagger
@@ -9,6 +21,7 @@ const { body, query, param, matchedData, validationResult } = require('express-v
  *      get:
  *        tags: 
  *            - Teachers
+ *        security: [ { bearerAuth: [] } ]
  *        summary:
  *            Получение списка всех учителей
  *        description:
@@ -19,7 +32,7 @@ const { body, query, param, matchedData, validationResult } = require('express-v
  *          400:
  *            description: bad request 
  */
-router.get('/', TeachersControllers.getTeachers);
+router.get('/', authenticateToken, TeachersControllers.getTeachers);
 
 /**
  * @swagger
@@ -27,6 +40,7 @@ router.get('/', TeachersControllers.getTeachers);
  *      get:
  *        tags: 
  *            - Teachers
+ *        security: [ { bearerAuth: [] } ]
  *        summary:
  *            Получение данных учителя по ID
  *        description:
@@ -42,7 +56,55 @@ router.get('/', TeachersControllers.getTeachers);
  *          400:
  *            description: bad request 
  */
-router.get('/:id', TeachersControllers.getTeacherById);
+router.get('/:id', authenticateToken, validationParamId, TeachersControllers.getTeacherById);
+
+/**
+ * @swagger
+ *  /teachers/{id}/courses:
+ *      get:
+ *        tags: 
+ *            - Teachers
+ *        security: [ { bearerAuth: [] } ]
+ *        summary:
+ *            Получение курсов учителя
+ *        description:
+ *            Получение курсов учителя по ID-учителя 
+ *        parameters:
+ *            - name: id
+ *              in: path
+ *              description: ID учителя, курсы которого нужно получить 
+ *              required: true
+ *        responses:
+ *          200: 
+ *            description: A successful response, get courses
+ *          400:
+ *            description: bad request 
+ */
+router.get('/:id/courses', authenticateToken, validationParamId, TeachersControllers.getTeachersCourse);
+
+/**
+ * @swagger
+ *  /teachers/{id}/students:
+ *      get:
+ *        tags: 
+ *            - Teachers
+ *        security: [ { bearerAuth: [] } ]
+ *        summary:
+ *            Получение студентов учителя
+ *        description:
+ *            Получение студентов учителя по ID-учителя 
+ *        parameters:
+ *            - name: id
+ *              in: path
+ *              description: ID учителя, студентов которого нужно получить 
+ *              required: true
+ *        responses:
+ *          200: 
+ *            description: A successful response, get students
+ *          400:
+ *            description: bad request 
+ */
+router.get('/:id/students', authenticateToken, validationParamId, TeachersControllers.getStudentsTeacher);
 
 /**
  *@swagger
@@ -50,6 +112,7 @@ router.get('/:id', TeachersControllers.getTeacherById);
  *    post:
  *      tags:
  *         - Teachers
+ *      security: [ { bearerAuth: [] } ]
  *      summary: Добавление нового учителя 
  *      description: Добавление нового учителя, указываем имя, фамилию, email
  *      requestBody:
@@ -82,7 +145,7 @@ router.get('/:id', TeachersControllers.getTeacherById);
  *                  example: mail@mail.com 
  *                  description: email учителя
  */
-router.post('/', TeachersControllers.createTeacher);
+router.post('/', authenticateToken, validationBody, TeachersControllers.createTeacher);
 
 /**
  *@swagger
@@ -90,6 +153,7 @@ router.post('/', TeachersControllers.createTeacher);
  *    patch:
  *      tags:
  *         - Teachers
+ *      security: [ { bearerAuth: [] } ]
  *      summary: Обновление данных учителя
  *      description: Обновление данных учителя
  *      requestBody:
@@ -105,7 +169,7 @@ router.post('/', TeachersControllers.createTeacher);
  *          400:
  *            description: bad request
  */
-router.patch('/:id', TeachersControllers.updateTeacher);
+router.patch('/:id', authenticateToken, validationBody, validationParamId, TeachersControllers.updateTeacher);
 
 /**
  *@swagger
@@ -113,6 +177,7 @@ router.patch('/:id', TeachersControllers.updateTeacher);
  *    delete:
  *      tags:
  *         - Teachers
+ *      security: [ { bearerAuth: [] } ]
  *      summary: Удаление данных учителя 
  *      description: Удаление данных учителя по ID
  *      parameters:
@@ -126,6 +191,6 @@ router.patch('/:id', TeachersControllers.updateTeacher);
  *          400:
  *            description: bad request
  */
-router.delete('/:id', TeachersControllers.deleteTeacher);
+router.delete('/:id', authenticateToken, validationParamId, TeachersControllers.deleteTeacher);
 
 module.exports = router;

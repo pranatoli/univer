@@ -25,7 +25,7 @@ const Profile = db.define('profile', {
         type: Sequilize.STRING,
         allowNull: false,
     },
-    student_id: {
+    studentId: {
         type: Sequilize.INTEGER,
         references: {
             model: Students,

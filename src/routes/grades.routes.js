@@ -1,7 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const GradesControllers = require('../controllers/grades.controllers');
+const { authenticateToken } = require('../helpers/helpers');
 const { body, query, param, matchedData, validationResult } = require('express-validator');
+
+const validationBody = [
+    body('studentId').notEmpty().isInt().escape(),
+    body('courseId').notEmpty().isInt().escape(),
+    body('grade').notEmpty().isInt().escape(),
+];
+
+const validationId = [
+    param('id').notEmpty().isInt().withMessage('ID not correct'),
+    param('student_id').notEmpty().isInt().withMessage('ID not correct'),
+    param('course_id').notEmpty().isInt().withMessage('ID not correct')
+];
+
+const validationCourseId = [
+    param('course_id').notEmpty().isInt().withMessage('ID not correct')
+];
+const validationStudId = [
+    param('student_id').notEmpty().isInt().withMessage('ID not correct'),
+];
 
 /**
  * @swagger
@@ -9,10 +29,11 @@ const { body, query, param, matchedData, validationResult } = require('express-v
  *      get:
  *        tags: 
  *            - Grades
+ *        security: [ { bearerAuth: [] } ]
  *        summary:
- *            Получение всех оценок студента
+ *            Получение всех + средней оценки оценок студента
  *        description:
- *            Получение всех оценок по ID-студента
+ *            Получение всех оценок + средней оценки по ID-студента
  *        parameters:
  *            - name: student_id
  *              in: path
@@ -24,7 +45,7 @@ const { body, query, param, matchedData, validationResult } = require('express-v
  *          400:
  *            description: bad request 
  */
-router.get('/student/:student_id', GradesControllers.getGradeStudent);
+router.get('/student/:student_id', authenticateToken, validationStudId, GradesControllers.getGradeStudent);
 
 /**
  * @swagger
@@ -32,10 +53,11 @@ router.get('/student/:student_id', GradesControllers.getGradeStudent);
  *      get:
  *        tags: 
  *            - Grades
+ *        security: [ { bearerAuth: [] } ]
  *        summary:
- *            Получение всех оценок студента
+ *            Получение всех оценок + средней оценки студента за определенный курс
  *        description:
- *            Получение всех оценок по ID-студента
+ *            Получение всех оценок + средней оценки по ID-студента и ID-курса
  *        parameters:
  *            - name: student_id
  *              in: path
@@ -51,7 +73,7 @@ router.get('/student/:student_id', GradesControllers.getGradeStudent);
  *          400:
  *            description: bad request 
  */
-router.get('/student/:student_id/course/:course_id', GradesControllers.getGradeOnCourse);
+router.get('/student/:student_id/course/:course_id', authenticateToken, validationStudId, validationCourseId, GradesControllers.getGradeOnCourse);
 
 /**
  *@swagger
@@ -59,7 +81,8 @@ router.get('/student/:student_id/course/:course_id', GradesControllers.getGradeO
  *    post:
  *      tags:
  *         - Grades
- *      summary: Добавление нового учителя 
+ *      security: [ { bearerAuth: [] } ]
+ *      summary: Добавление оценки 
  *      description: Добавление новой оценки, указываем ID-студента,  ID-курса, оценку
  *      requestBody:
  *        $ref: "#/components/requestBodies/Grade"
@@ -70,7 +93,7 @@ router.get('/student/:student_id/course/:course_id', GradesControllers.getGradeO
  *            description: bad request
  * components:
  *    requestBodies:
- *      Teacher:
+ *      Grade:
  *        description: Пример тела запроса, указываем ID-студента,  ID-курса, оценку
  *        required: true
  *        content:
@@ -78,11 +101,11 @@ router.get('/student/:student_id/course/:course_id', GradesControllers.getGradeO
  *            schema:
  *              type: object
  *              properties:
- *                teacher_id:
+ *                studentId:
  *                  type: integer
  *                  example: 1
  *                  description: идентификатор преподавателя
- *                course_id:
+ *                courseId:
  *                  type: integer
  *                  example: 1
  *                  description: идентификатор курса
@@ -91,7 +114,7 @@ router.get('/student/:student_id/course/:course_id', GradesControllers.getGradeO
  *                  example: 7 
  *                  description: оценка
  */
-router.post('/', GradesControllers.createGrade);
+router.post('/', authenticateToken, GradesControllers.createGrade);
 
 /**
  *@swagger
@@ -99,6 +122,7 @@ router.post('/', GradesControllers.createGrade);
  *    patch:
  *      tags:
  *         - Grades
+ *      security: [ { bearerAuth: [] } ]
  *      summary: Обновление оценки
  *      description: Обновление оценки
  *      requestBody:
@@ -114,7 +138,7 @@ router.post('/', GradesControllers.createGrade);
  *          400:
  *            description: bad request
  */
-router.patch('/:id', GradesControllers.updateGrade);
+router.patch('/:id', authenticateToken, validationId, GradesControllers.updateGrade);
 
 /**
  *@swagger
@@ -122,6 +146,7 @@ router.patch('/:id', GradesControllers.updateGrade);
  *    delete:
  *      tags:
  *         - Grades
+ *      security: [ { bearerAuth: [] } ]
  *      summary: Удаление оценки 
  *      description: Удаление оценки
  *      parameters:
@@ -135,6 +160,6 @@ router.patch('/:id', GradesControllers.updateGrade);
  *          400:
  *            description: bad request
  */
-router.delete('/:id', GradesControllers.deleteGrade);
+router.delete('/:id', authenticateToken, validationId, GradesControllers.deleteGrade);
 
 module.exports = router;

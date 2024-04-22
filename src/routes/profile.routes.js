@@ -1,7 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const ProfilesControllers = require('../controllers/profile.controllers');
+const { authenticateToken } = require('../helpers/helpers');
 const { body, query, param, matchedData, validationResult } = require('express-validator');
+
+const validationBody = [
+    body('first_name').notEmpty().isString().trim().escape(),
+    body('last_name').notEmpty().isString().trim().escape(),
+    body('date_of_birth').notEmpty().isDate().trim().escape(),
+    body('adress').notEmpty().isString().trim().escape(),
+    body('studentId').notEmpty().isInt().trim().escape(),
+];
+
+const validationParamId = [
+    param('id').notEmpty().isInt().withMessage('ID not correct')
+]
 
 /**
  * @swagger
@@ -9,6 +22,7 @@ const { body, query, param, matchedData, validationResult } = require('express-v
  *      get:
  *        tags: 
  *            - Profiles
+ *        security: [ { bearerAuth: [] } ]
  *        summary:
  *            Получение списка всех профилей
  *        description:
@@ -19,7 +33,7 @@ const { body, query, param, matchedData, validationResult } = require('express-v
  *          400:
  *            description: bad request 
  */
-router.get('/', ProfilesControllers.getProfiles);
+router.get('/', authenticateToken, ProfilesControllers.getProfiles);
 
 /**
  * @swagger
@@ -27,6 +41,7 @@ router.get('/', ProfilesControllers.getProfiles);
  *      get:
  *        tags: 
  *            - Profiles
+ *        security: [ { bearerAuth: [] } ]
  *        summary:
  *            Получение данных профиля по ID
  *        description:
@@ -42,7 +57,7 @@ router.get('/', ProfilesControllers.getProfiles);
  *          400:
  *            description: bad request 
  */
-router.get('/:id', ProfilesControllers.getProfileById);
+router.get('/:id', authenticateToken, validationParamId, ProfilesControllers.getProfileById);
 
 /**
  *@swagger
@@ -50,6 +65,7 @@ router.get('/:id', ProfilesControllers.getProfileById);
  *    post:
  *      tags:
  *         - Profiles
+ *      security: [ { bearerAuth: [] } ]
  *      summary: Добавление нового студента 
  *      description: Добавление нового профиля, указываем имя, фамилию, дату рождения. адрес, ID-студента к которому относится профиль
  *      requestBody:
@@ -85,12 +101,12 @@ router.get('/:id', ProfilesControllers.getProfileById);
  *                  type: string
  *                  example: Беларусь, Витебск, Ленина 23-5
  *                  description: адрес студента
- *                student_id:
+ *                studentId:
  *                  type: integer
  *                  example: 1
  *                  description: идентификатор студента
  */
-router.post('/', ProfilesControllers.createProfile);
+router.post('/', authenticateToken, ProfilesControllers.createProfile);
 
 /**
  *@swagger
@@ -98,6 +114,7 @@ router.post('/', ProfilesControllers.createProfile);
  *    patch:
  *      tags:
  *         - Profiles
+ *      security: [ { bearerAuth: [] } ]
  *      summary: Обновление профиля 
  *      description: Обновление информации профиля 
  *      requestBody:
@@ -113,7 +130,7 @@ router.post('/', ProfilesControllers.createProfile);
  *          400:
  *            description: bad request
  */
-router.patch('/:id', ProfilesControllers.updateProfile);
+router.patch('/:id', authenticateToken, validationParamId, ProfilesControllers.updateProfile);
 
 /**
  *@swagger
@@ -121,6 +138,7 @@ router.patch('/:id', ProfilesControllers.updateProfile);
  *    delete:
  *      tags:
  *         - Profiles
+ *      security: [ { bearerAuth: [] } ]
  *      summary: Удаление профиля 
  *      description: Удаление профиля по ID
  *      parameters:
@@ -134,6 +152,6 @@ router.patch('/:id', ProfilesControllers.updateProfile);
  *          400:
  *            description: bad request
  */
-router.delete('/:id', ProfilesControllers.deleteProfile);
+router.delete('/:id', authenticateToken, validationParamId, ProfilesControllers.deleteProfile);
 
 module.exports = router;

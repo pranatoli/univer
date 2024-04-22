@@ -9,14 +9,14 @@ const StudentCourses = db.define('StudentCourses', {
         primaryKey: true,
         autoIncrement: true,
     },
-    student_id: {
+    studentId: {
         type: Sequilize.INTEGER,
         references: {
             model: Students,
             key: 'id',
         }
     },
-    course_id: {
+    courseId: {
         type: Sequilize.INTEGER,
         references: {
             model: Courses,

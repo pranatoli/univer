@@ -33,7 +33,7 @@ const swaggerOptioins = {
             servers: [`http://localhost:${port}/`],
             version: "1.0.0"
         },
-        basePath: '/api',
+        basePath: '/',
         components: {
             securitySchemes: {
                 bearerAuth: {

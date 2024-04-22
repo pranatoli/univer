@@ -17,7 +17,7 @@ const Course = db.define('course', {
         type: Sequilize.STRING,
         allowNull: false,
     },
-    teacher_id: {
+    teacherId: {
         type: Sequilize.INTEGER,
         references: {
             model: Teachers,

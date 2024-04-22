@@ -1,7 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const CoursesControllers = require('../controllers/courses.controllers');
+const { authenticateToken } = require('../helpers/helpers');
 const { body, query, param, matchedData, validationResult } = require('express-validator');
+
+const validationBody = [
+    body('course_name').notEmpty().isString().trim().escape(),
+    body('description').notEmpty().isString().trim().escape(),
+    body('teacherId').notEmpty().isInt().escape(),
+];
+
+const validationParamId = [
+    param('id').notEmpty().isInt().withMessage('ID not correct')
+];
 
 /**
  * @swagger
@@ -9,6 +20,7 @@ const { body, query, param, matchedData, validationResult } = require('express-v
  *      get:
  *        tags: 
  *            - Courses
+ *        security: [ { bearerAuth: [] } ]
  *        summary:
  *            Получение списка всех курсов
  *        description:
@@ -19,7 +31,7 @@ const { body, query, param, matchedData, validationResult } = require('express-v
  *          400:
  *            description: bad request 
  */
-router.get('/', CoursesControllers.getCourses);
+router.get('/', authenticateToken, CoursesControllers.getCourses);
 
 /**
  * @swagger
@@ -27,6 +39,7 @@ router.get('/', CoursesControllers.getCourses);
  *      get:
  *        tags: 
  *            - Courses
+ *        security: [ { bearerAuth: [] } ]
  *        summary:
  *            Получение курса по ID
  *        description:
@@ -42,7 +55,31 @@ router.get('/', CoursesControllers.getCourses);
  *          400:
  *            description: bad request 
  */
-router.get('/:id', CoursesControllers.getCourseById);
+router.get('/:id', authenticateToken, validationParamId, CoursesControllers.getCourseById);
+
+/**
+ * @swagger
+ *  /courses/{id}/students:
+ *      get:
+ *        tags: 
+ *            - Courses
+ *        security: [ { bearerAuth: [] } ]
+ *        summary:
+ *            Получение студентов курса
+ *        description:
+ *            Получение студентов курса по ID-курса
+ *        parameters:
+ *            - name: id
+ *              in: path
+ *              description: ID курса, студентов которого нужно получить 
+ *              required: true
+ *        responses:
+ *          200: 
+ *            description: A successful response, get students 
+ *          400:
+ *            description: bad request 
+ */
+router.get('/:id/students', authenticateToken, validationParamId, CoursesControllers.getStudentsCourse);
 
 /**
  *@swagger
@@ -50,6 +87,7 @@ router.get('/:id', CoursesControllers.getCourseById);
  *    post:
  *      tags:
  *         - Courses
+ *      security: [ { bearerAuth: [] } ]
  *      summary: Добавление нового курса 
  *      description: Добавление нового курса, указываем название курса, описание курса, идентификатор преподавателя
  *      requestBody:
@@ -77,12 +115,12 @@ router.get('/:id', CoursesControllers.getCourseById);
  *                  type: string
  *                  example: Курс по разработке фронта
  *                  description: описание курса
- *                teacher_id:
+ *                teacherId:
  *                  type: integer
  *                  example: 1
  *                  description: идентификатор преподавателя
  */
-router.post('/', CoursesControllers.createCourse);
+router.post('/', authenticateToken, validationBody, CoursesControllers.createCourse);
 
 /**
  *@swagger
@@ -90,6 +128,7 @@ router.post('/', CoursesControllers.createCourse);
  *    patch:
  *      tags:
  *         - Courses
+ *      security: [ { bearerAuth: [] } ]
  *      summary: Обновление курса 
  *      description: Обновление информации курса 
  *      requestBody:
@@ -105,7 +144,7 @@ router.post('/', CoursesControllers.createCourse);
  *          400:
  *            description: bad request
  */
-router.patch('/:id', CoursesControllers.updateCourse);
+router.patch('/:id', authenticateToken, validationParamId, validationBody, CoursesControllers.updateCourse);
 
 /**
  *@swagger
@@ -113,6 +152,7 @@ router.patch('/:id', CoursesControllers.updateCourse);
  *    delete:
  *      tags:
  *         - Courses
+ *      security: [ { bearerAuth: [] } ]
  *      summary: Удаление курса 
  *      description: Удаление курса по ID
  *      parameters:
@@ -126,7 +166,7 @@ router.patch('/:id', CoursesControllers.updateCourse);
  *          400:
  *            description: bad request
  */
-router.delete('/:id', CoursesControllers.deleteCourse);
+router.delete('/:id', authenticateToken, validationParamId, CoursesControllers.deleteCourse);
 
 
 module.exports = router;

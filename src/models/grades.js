@@ -10,14 +10,14 @@ const Grade = db.define('grade', {
         primaryKey: true,
         allowNull: false
     },
-    student_id: {
+    studentId: {
         type: Sequilize.INTEGER,
         references: {
             model: Students,
             key: 'id',
         }
     },
-    course_id: {
+    courseId: {
         type: Sequilize.INTEGER,
         references: {
             model: Courses,

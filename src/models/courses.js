@@ -9,7 +9,7 @@ const Course = db.define('course', {
         primaryKey: true,
         allowNull: false
     },
-    course_name: {
+    Id: {
         type: Sequilize.STRING,
         allowNull: false,
     },
